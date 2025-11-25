@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document Entity Extractor</title>
+    <style>
+        /* Base Styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: #fbfbfa;
+            color: #2f2f2f;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h2, h3 {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        p {
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        /* Card style like Notion blocks */
+        .card {
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #444;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            background: #fafafa;
+            width: 100%;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        input[type="file"]:hover {
+            border-color: #8c8c8c;
+        }
+
+        input[type="submit"] {
+            margin-top: 15px;
+            padding: 10px 18px;
+            background: #111;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        input[type="submit"]:hover {
+            background: #333;
+        }
+
+        /* Preformatted output */
+        pre {
+            background: #fafafa;
+            padding: 15px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.5;
+            border: 1px solid #e5e5e5;
+        }
+
+        /* Table styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        table th, table td {
+            border: 1px solid #e5e5e5;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        table th {
+            background: #f5f5f5;
+            font-weight: 600;
+        }
+
+        /* Results layout */
+        .results-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .results-container > div {
+            flex: 1;
+            min-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Document Entity Extractor</h2>
+        <p>Upload a document to extract entities and analyze structured data from the text.</p>
+        
+        <!-- Upload Form -->
+        <div class="card">
+            <form action="/extract" method="post" enctype="multipart/form-data">
+                <label for="CustomFile">Choose a file</label>
+                <input type="file" name="file" id="CustomFile" accept=".pdf,.doc,.docx,.txt" required>
+                <br>
+                <input type="submit" value="Analyze Document">
+            </form>
+        </div>
+
+        {% if text %}
+            <!-- Extracted Text -->
+            <div class="card">
+                <h3>Extracted Text</h3>
+                <pre>{{ text }}</pre>
+            </div>
+
+            <!-- Processed Output -->
+            <div class="card">
+                <h3>Processed Output</h3>
+                {% if results["Extracted Data"] %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Segment</th>
+                                <th>Label</th>
+                                <th>Matched Keyword</th>
+                                <th>Extracted Value</th>
+                                <th>Offset</th>
+                                <th>Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in results["Extracted Data"] %}
+                                <tr>
+                                    <td>{{ item.segment }}</td>
+                                    <td>{{ item.detected_label }}</td>
+                                    <td>{{ item.matched_keyword or '-' }}</td>
+                                    <td>{{ item.extracted_value }}</td>
+                                    <td>{{ item.offset.start }} - {{ item.offset.end }}</td>
+                                    <td>{{ item.confidence }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>No entities were extracted.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
